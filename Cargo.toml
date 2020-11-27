@@ -1,0 +1,15 @@
+[package]
+name = "pleasent-keepass-client-rs"
+version = "0.1.0"
+authors = ["Timo Bryant <kinchdeadalus+github@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.3.20"
+tokio = { version = "0.2", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+url = "2.1.1"
+pretty_env_logger = "0.4.0"
+reqwest = { version = "0.10", features = ["json"] }
+log = "0.4.11"
+futures = "0.3.7"
