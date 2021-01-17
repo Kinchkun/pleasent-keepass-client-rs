@@ -19,18 +19,24 @@ async fn main() -> Result<(), std::boxed::Box<dyn std::error::Error>> {
     let url = require_url("PLEASANT_PASSWORD_SERVER_URL");
     let login = require_string("PLEASANT_PASSWORD_SERVER_LOGIN");
     let password = require_secure_string("PLEASANT_PASSWORD_SERVER_PASSWORD");
-    let client = PleasantPasswordServerClient::new(url, login, password.as_str().to_string());
+    let client = PleasantPasswordServerClient::new(url, login, password.as_str().to_string())
+        .expect("Could not create client");
 
     let args: Args = Args::from_args();
 
     match args {
-        Args::GetPassword { entry_id } => print_password(client, entry_id).await,
+        Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
     };
 
     Ok(())
 }
 
-async fn print_password(client: PleasantPasswordServerClient, entry_id: String) {
+async fn print_password(
+    client: PleasantPasswordServerClient,
+    entry_id: String,
+) -> Result<(), std::boxed::Box<dyn std::error::Error>> {
     // 94153de4-1cba-4c13-9c23-41cde415146b
-    let password = client.entry_password(entry_id.as_str()).await;
+    let password = client.entry_password(entry_id.as_str()).await?.unwrap();
+    println!("{}", password);
+    Ok(())
 }

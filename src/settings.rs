@@ -1,10 +1,9 @@
-use colored::{Color, ColoredString, Colorize};
+use colored::{ColoredString, Colorize};
 use log::*;
-use serde::export::Formatter;
 use std::env;
 use std::env::VarError;
-use std::fmt::{Debug, Display, Result as FmtResult};
-use url::{ParseError, Url};
+use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
+use url::Url;
 
 /// A string but will be masked when printed
 pub struct SecureString(String);
