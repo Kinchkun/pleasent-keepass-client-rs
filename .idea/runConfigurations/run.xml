@@ -1,12 +1,17 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="channel" value="DEFAULT" />
-    <option name="command" value="run --package pleasent-keepass-client-rs --bin pleasent-keepass-client-rs" />
-    <option name="allFeatures" value="false" />
-    <option name="emulateTerminal" value="false" />
-    <option name="backtrace" value="SHORT" />
+    <option name="command" value="run --package pleasent-keepass-client-rs --bin pleasent-keepass-client-rs -- pw 94153de4-1cba-4c13-9c23-41cde415146b" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-    <envs />
+    <option name="channel" value="DEFAULT" />
+    <option name="allFeatures" value="false" />
+    <option name="emulateTerminal" value="true" />
+    <option name="backtrace" value="SHORT" />
+    <envs>
+      <env name="RUST_LOG" value="debug" />
+      <env name="HTTPS_PROXY" value="http://127.0.0.1:8080" />
+    </envs>
+    <option name="isRedirectInput" value="false" />
+    <option name="redirectInputPath" value="" />
     <method v="2">
       <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
     </method>

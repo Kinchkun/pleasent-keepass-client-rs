@@ -1,4 +1,6 @@
-use log::info;
+pub mod settings;
+
+use log::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
@@ -47,7 +49,7 @@ impl PleasantPasswordServerClient {
             .text()
             .await?;
 
-        println!("{}", response);
+        debug!("{}", response);
 
         Ok(None)
     }
