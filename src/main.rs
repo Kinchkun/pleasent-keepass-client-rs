@@ -9,6 +9,8 @@ use url::Url;
 enum Args {
     #[structopt(about = "retrieve the password for an entry id", alias = "pw")]
     GetPassword { entry_id: String },
+    #[structopt(about = "(debug) list the entry tree")]
+    Tree {},
 }
 
 #[tokio::main]
@@ -26,6 +28,7 @@ async fn main() -> Result<(), std::boxed::Box<dyn std::error::Error>> {
 
     match args {
         Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
+        Args::Tree => println!("{}", client.list_entries().await?),
     };
 
     Ok(())

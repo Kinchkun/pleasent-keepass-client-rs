@@ -23,7 +23,7 @@ impl TimedCache {
                    valid_until TEXT
         )",
             params![],
-        );
+        )?;
         Ok(TimedCache { connection: conn })
     }
 
