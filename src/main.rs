@@ -2,7 +2,6 @@ use log::info;
 use pleasent_keepass_client_rs::settings::{require_secure_string, require_string, require_url};
 use pleasent_keepass_client_rs::PleasantPasswordServerClient;
 use structopt::StructOpt;
-use url::Url;
 
 #[derive(StructOpt, Debug)]
 #[structopt(about = "pleasant password client")]
@@ -28,7 +27,7 @@ async fn main() -> Result<(), std::boxed::Box<dyn std::error::Error>> {
 
     match args {
         Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
-        Args::Tree => println!("{}", client.list_entries().await?),
+        Args::Tree {} => println!("{}", client.list_entries().await?),
     };
 
     Ok(())

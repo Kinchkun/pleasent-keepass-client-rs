@@ -42,7 +42,12 @@ impl PleasantPasswordServerClient {
 
     pub async fn list_entries(&self) -> Result<String> {
         let access_token = self.login().await?;
-        Ok(self.http_client.get_tree(access_token).await?.text())
+        Ok(self
+            .http_client
+            .get_tree(access_token)
+            .await?
+            .text()
+            .await?)
     }
 
     pub async fn entry_password(&self, entry_id: &str) -> Result<Option<String>> {

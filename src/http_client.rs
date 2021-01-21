@@ -37,7 +37,11 @@ impl HttpClient {
     }
 
     pub async fn get_tree<S: AsRef<str>>(&self, access_token: S) -> Result<Response> {
-        Ok(self.get("/api/v5/rest/folders").send().await?)
+        Ok(self
+            .get("/api/v5/rest/folders")
+            .bearer_auth(access_token.as_ref())
+            .send()
+            .await?)
     }
 
     fn get(&self, path: &str) -> RequestBuilder {
