@@ -1,13 +1,16 @@
 mod app;
 mod db;
 mod http_client;
+mod model;
 pub mod settings;
 mod timed_cache;
 mod types;
 
 use crate::db::db_types::Folder;
 use crate::http_client::HttpClient;
+use crate::model::PleasantPasswordModel;
 use log::*;
+use rusqlite::Connection;
 use serde::Deserialize;
 use std::error::Error;
 use url::Url;
@@ -39,6 +42,14 @@ impl PleasantPasswordServerClient {
                 "cache",
             )?)?,
         })
+    }
+
+    pub async fn sync(&self) -> Result<()> {
+        let connection =
+            Connection::open(app::app_file("pleasant_password_client", "credentials.db")?)?;
+        let model = PleasantPasswordModel::new(connection)?;
+        let root_folder = self.list_entries().await?;
+        model.add_root_folder(root_folder)
     }
 
     pub async fn list_entries(&self) -> Result<Folder> {

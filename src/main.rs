@@ -13,6 +13,8 @@ enum Args {
     GetPassword { entry_id: String },
     #[structopt(about = "(debug) list the entry tree")]
     Tree {},
+    #[structopt(about = "download all credentials entries (without passwords)")]
+    Sync {},
 }
 
 #[tokio::main]
@@ -50,6 +52,7 @@ async fn main() -> Result<(), std::boxed::Box<dyn std::error::Error>> {
     match args {
         Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
         Args::Tree {} => println!("{:#?}", client.list_entries().await?),
+        Args::Sync {} => client.sync().await?,
     };
 
     Ok(())
