@@ -8,7 +8,7 @@ mod types;
 
 use crate::db::db_types::Folder;
 use crate::http_client::HttpClient;
-use crate::model::PleasantPasswordModel;
+use crate::model::{Credentials, PleasantPasswordModel};
 use log::*;
 use rusqlite::Connection;
 use serde::Deserialize;
@@ -42,6 +42,13 @@ impl PleasantPasswordServerClient {
                 "cache",
             )?)?,
         })
+    }
+
+    pub fn query(&self, query: &str) -> Result<Vec<Credentials>> {
+        let connection =
+            Connection::open(app::app_file("pleasant_password_client", "credentials.db")?)?;
+        let model = PleasantPasswordModel::new(connection)?;
+        model.query_for_credentials(query)
     }
 
     pub async fn sync(&self) -> Result<()> {

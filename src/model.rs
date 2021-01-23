@@ -3,9 +3,19 @@ use crate::types::*;
 use chrono::Utc;
 use log::*;
 use rusqlite::{params, Connection};
+use serde::Serialize;
 
 pub struct PleasantPasswordModel {
     connection: Connection,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Credentials {
+    id: String,
+    folder_name: String,
+    name: String,
+    username: Option<String>,
+    notes: Option<String>,
 }
 
 impl PleasantPasswordModel {
@@ -15,11 +25,49 @@ impl PleasantPasswordModel {
         Ok(model)
     }
 
+    pub fn query_for_credentials(&self, query: &str) -> Result<Vec<Credentials>> {
+        let mut stmt = self.connection.prepare(
+            r#"
+SELECT c.id, f.name, c.name, c.username, c.notes FROM credentials c
+INNER JOIN folders f on c.group_id = f.id
+WHERE f.name like '%' || :query || '%'
+OR c.name like '%' || :query || '%'
+OR c.username like '%' || :query || '%'
+OR c.notes like '%' || :query || '%'
+"#,
+        )?;
+
+        let mut rows = stmt.query_named(&[(":query", &query)])?;
+
+        let mut result: Vec<Credentials> = Vec::new();
+        while let Some(row) = rows.next()? {
+            let id: String = row.get(0)?;
+            let folder_name: String = row.get(1)?;
+            let name: String = row.get(2)?;
+            let username: Option<String> = row.get(3)?;
+            let notes: Option<String> = row.get(4)?;
+
+            result.push(Credentials {
+                id,
+                folder_name,
+                name,
+                username,
+                notes,
+            });
+        }
+
+        Ok(result)
+    }
+
     pub fn add_root_folder(&self, folder: Folder) -> Result<()> {
         debug!("Add root folder. Truncating tables");
-        self.connection
-            .execute("DELETE FROM credentials;", params![])?;
-        self.connection.execute("DELETE FROM folders;", params![])?;
+        self.connection.execute_batch(
+            r#"
+DELETE FROM credentials;
+DELETE FROM folders;
+DELETE FROM attachments;
+        "#,
+        )?;
 
         self.add_folder(folder)
     }

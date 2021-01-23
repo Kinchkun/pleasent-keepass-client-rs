@@ -1,7 +1,3 @@
-DROP TABLE if exists credentials;
-DROP TABLE if exists folders;
-DROP TABLE if exists attachments;
-
 CREATE TABLE IF NOT EXISTS credentials (
                                            id TEXT PRIMARY KEY NOT NULL,
                                            name TEXT NOT NULL ,
