@@ -26,4 +26,6 @@ pub struct Folder {
     pub parent_id: String,
     pub created: DateTime,
     pub modified: DateTime,
+    pub expires: Option<DateTime>,
+    pub synced: Option<DateTime>,
 }
