@@ -8,6 +8,7 @@ pub struct CredentialEntry {
     pub id: String,
     pub name: String,
     pub username: Option<String>,
+    pub attachments: Vec<Attachment>,
     pub notes: Option<String>,
     pub group_id: String,
     pub created: DateTime,
@@ -28,4 +29,13 @@ pub struct Folder {
     pub modified: DateTime,
     pub expires: Option<DateTime>,
     pub synced: Option<DateTime>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct Attachment {
+    pub credential_object_id: String,
+    pub attachment_id: String,
+    pub file_name: String,
+    pub file_size: i64,
 }

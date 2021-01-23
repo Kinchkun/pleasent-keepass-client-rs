@@ -1,4 +1,4 @@
-use crate::db::db_types::{CredentialEntry, Folder};
+use crate::db::db_types::{Attachment, CredentialEntry, Folder};
 use crate::types::*;
 use chrono::Utc;
 use log::*;
@@ -24,7 +24,7 @@ impl PleasantPasswordModel {
         self.add_folder(folder)
     }
 
-    pub fn add_folder(&self, folder: Folder) -> Result<()> {
+    fn add_folder(&self, folder: Folder) -> Result<()> {
         debug!("Add folder {}", &folder.name);
 
         let statement = r#"
@@ -54,7 +54,7 @@ VALUES (?1,?2,?3,?4,?5,?6,?7)
         Ok(())
     }
 
-    pub fn add_credentials(&self, credential: CredentialEntry) -> Result<()> {
+    fn add_credentials(&self, credential: CredentialEntry) -> Result<()> {
         debug!("Add credentials entry {}", &credential.name);
         let id = &credential.id;
         let name = &credential.name;
@@ -72,6 +72,27 @@ VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
 "#,
             params![id, name, username, notes, group_id, created, modified, expires, synced],
         )?;
+
+        for attachment in credential.attachments.into_iter() {
+            self.add_attachment(attachment)?;
+        }
+
+        Ok(())
+    }
+
+    fn add_attachment(&self, attachment: Attachment) -> Result<()> {
+        debug!("Add attachment into database");
+        let statement = r#"
+INSERT INTO attachments (id, credentials_id, file_name, file_size) 
+VALUES (?1,?2,?3,?4)
+"#;
+        let id = &attachment.attachment_id;
+        let credentials_id = &attachment.credential_object_id;
+        let file_name = &attachment.file_name;
+        let file_size = &attachment.file_size;
+
+        self.connection
+            .execute(statement, params![id, credentials_id, file_name, file_size])?;
 
         Ok(())
     }
