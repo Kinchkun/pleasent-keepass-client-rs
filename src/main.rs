@@ -1,6 +1,9 @@
 use log::info;
-use pleasent_keepass_client_rs::settings::{require_secure_string, require_string, require_url};
+use pleasent_keepass_client_rs::settings::{
+    optional_url, require_secure_string, require_string, require_url,
+};
 use pleasent_keepass_client_rs::PleasantPasswordServerClient;
+use reqwest::Proxy;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
@@ -18,16 +21,35 @@ async fn main() -> Result<(), std::boxed::Box<dyn std::error::Error>> {
     pretty_env_logger::init_timed();
 
     let url = require_url("PLEASANT_PASSWORD_SERVER_URL");
+    let http_proxy = optional_url("HTTP_PROXY");
+    let https_proxy = optional_url("HTTPS_PROXY");
     let login = require_string("PLEASANT_PASSWORD_SERVER_LOGIN");
     let password = require_secure_string("PLEASANT_PASSWORD_SERVER_PASSWORD");
-    let client = PleasantPasswordServerClient::new(url, login, password.as_str().to_string())
-        .expect("Could not create client");
+
+    let mut client = reqwest::Client::builder();
+    let mut client = if let Some(proxy_url) = http_proxy {
+        client.proxy(Proxy::http(proxy_url)?)
+    } else {
+        client
+    };
+
+    let mut client = if let Some(proxy_url) = https_proxy {
+        client.proxy(Proxy::https(proxy_url)?)
+    } else {
+        client
+    };
+
+    let client = client.build()?;
+
+    let client =
+        PleasantPasswordServerClient::new(url, client, login, password.as_str().to_string())
+            .expect("Could not create client");
 
     let args: Args = Args::from_args();
 
     match args {
         Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
-        Args::Tree {} => println!("{}", client.list_entries().await?),
+        Args::Tree {} => println!("{:#?}", client.list_entries().await?),
     };
 
     Ok(())

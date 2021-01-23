@@ -5,6 +5,7 @@ pub mod settings;
 mod timed_cache;
 mod types;
 
+use crate::db::db_types::Folder;
 use crate::http_client::HttpClient;
 use log::*;
 use serde::Deserialize;
@@ -28,11 +29,11 @@ struct TokenResponse {
 }
 
 impl PleasantPasswordServerClient {
-    pub fn new(url: Url, login: String, password: String) -> Result<Self> {
+    pub fn new(url: Url, client: reqwest::Client, login: String, password: String) -> Result<Self> {
         Ok(PleasantPasswordServerClient {
             login,
             password,
-            http_client: HttpClient::new(url),
+            http_client: HttpClient::new(url, client),
             cache: timed_cache::TimedCache::open(app::app_file(
                 "pleasant_password_client",
                 "cache",
@@ -40,14 +41,15 @@ impl PleasantPasswordServerClient {
         })
     }
 
-    pub async fn list_entries(&self) -> Result<String> {
+    pub async fn list_entries(&self) -> Result<Folder> {
         let access_token = self.login().await?;
-        Ok(self
+        let root_folder: Folder = self
             .http_client
             .get_tree(access_token)
             .await?
-            .text()
-            .await?)
+            .json()
+            .await?;
+        Ok(root_folder)
     }
 
     pub async fn entry_password(&self, entry_id: &str) -> Result<Option<String>> {

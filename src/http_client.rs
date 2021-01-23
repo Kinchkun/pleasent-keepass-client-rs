@@ -8,11 +8,8 @@ pub struct HttpClient {
 }
 
 impl HttpClient {
-    pub fn new(url: Url) -> Self {
-        HttpClient {
-            url,
-            client: reqwest::Client::new(),
-        }
+    pub fn new(url: Url, client: reqwest::Client) -> Self {
+        HttpClient { url, client }
     }
 
     pub async fn login(&self, login: &str, password: &str) -> Result<Response> {
