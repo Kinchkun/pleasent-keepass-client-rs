@@ -1,0 +1,132 @@
+{
+  "CustomUserFields": {},
+  "CustomApplicationFields": { },
+  "Children": [
+    {
+      "CustomUserFields": {},
+      "CustomApplicationFields": {},
+      "Children": [],
+      "Credentials": [
+        {
+          "CustomUserFields": {},
+          "CustomApplicationFields": {},
+          "Attachments": [],
+          "Tags": [],
+          "HasModifyEntriesAccess": true,
+          "HasViewEntryContentsAccess": true,
+          "HasViewEntryPasswordAccess": true,
+          "CommentPrompts": {
+            "AskForCommentOnViewPassword": false,
+            "AskForCommentOnViewOffline": false,
+            "AskForCommentOnModifyEntries": false,
+            "AskForCommentOnMoveEntries": false,
+            "AskForCommentOnMoveFolders": false,
+            "AskForCommentOnModifyFolders": false
+          },
+          "Id": "A2D7962C-FCC9-40EC-8384-9879F8EB0784",
+          "Name": "first child of second folder",
+          "Username": "Max@mustermann",
+          "Password": null,
+          "Url": "https://some.url",
+          "Notes": "Some Notes",
+          "GroupId": "F1EFF830-5217-4B11-A9E9-C4C4C3AF610D",
+          "Created": "2020-04-02T09:18:47+02:00",
+          "Modified": "2020-04-02T09:18:47+02:00",
+          "Expires": null
+        },
+        {
+          "CustomUserFields": {},
+          "CustomApplicationFields": {},
+          "Attachments": [],
+          "Tags": [],
+          "HasModifyEntriesAccess": true,
+          "HasViewEntryContentsAccess": true,
+          "HasViewEntryPasswordAccess": true,
+          "CommentPrompts": {
+            "AskForCommentOnViewPassword": false,
+            "AskForCommentOnViewOffline": false,
+            "AskForCommentOnModifyEntries": false,
+            "AskForCommentOnMoveEntries": false,
+            "AskForCommentOnMoveFolders": false,
+            "AskForCommentOnModifyFolders": false
+          },
+          "Id": "3AAC7C09-7506-4A89-975D-AFE5690C671F",
+          "Name": "an credenetials entry with username and url and notes",
+          "Username": "a username",
+          "Password": null,
+          "Url": "https://example.com",
+          "Notes": "some notes",
+          "GroupId": "F1EFF830-5217-4B11-A9E9-C4C4C3AF610D",
+          "Created": "2020-04-02T09:18:47+02:00",
+          "Modified": "2020-04-02T09:18:47+02:00",
+          "Expires": null
+        }
+      ],
+      "Tags": [],
+      "HasModifyEntriesAccess": true,
+      "HasViewEntryContentsAccess": true,
+      "CommentPrompts": {
+        "AskForCommentOnViewPassword": false,
+        "AskForCommentOnViewOffline": false,
+        "AskForCommentOnModifyEntries": false,
+        "AskForCommentOnMoveEntries": false,
+        "AskForCommentOnMoveFolders": false,
+        "AskForCommentOnModifyFolders": false
+      },
+      "Id": "F1EFF830-5217-4B11-A9E9-C4C4C3AF610D",
+      "Name": "devops",
+      "ParentId": "7C6A00CF-5AFB-48AF-A9F2-042C68A1C22D",
+      "Notes": null,
+      "Created": "2020-03-04T09:25:53+01:00",
+      "Modified": "2020-03-04T09:25:53+01:00",
+      "Expires": null
+    }
+  ],
+  "Credentials": [
+    {
+      "CustomUserFields": {},
+      "CustomApplicationFields": {},
+      "Attachments": [],
+      "Tags": [],
+      "HasModifyEntriesAccess": true,
+      "HasViewEntryContentsAccess": true,
+      "HasViewEntryPasswordAccess": true,
+      "CommentPrompts": {
+        "AskForCommentOnViewPassword": false,
+        "AskForCommentOnViewOffline": false,
+        "AskForCommentOnModifyEntries": false,
+        "AskForCommentOnMoveEntries": false,
+        "AskForCommentOnMoveFolders": false,
+        "AskForCommentOnModifyFolders": false
+      },
+      "Id": "52A3EE8D-30F2-40FB-A78C-5828155111C9",
+      "Name": "an root credentials entry",
+      "Username": "",
+      "Password": null,
+      "Url": "",
+      "Notes": "",
+      "GroupId": "7C6A00CF-5AFB-48AF-A9F2-042C68A1C22D",
+      "Created": "2020-04-02T09:18:47+02:00",
+      "Modified": "2020-04-02T09:18:47+02:00",
+      "Expires": null
+    }
+  ],
+  "Tags": [],
+  "HasModifyEntriesAccess": false,
+  "HasViewEntryContentsAccess": false,
+  "CommentPrompts": {
+    "AskForCommentOnViewPassword": false,
+    "AskForCommentOnViewOffline": false,
+    "AskForCommentOnModifyEntries": false,
+    "AskForCommentOnMoveEntries": false,
+    "AskForCommentOnMoveFolders": false,
+    "AskForCommentOnModifyFolders": false
+  },
+  "Id": "7C6A00CF-5AFB-48AF-A9F2-042C68A1C22D",
+  "Name": "Root",
+  "ParentId": "00000000-0000-0000-0000-000000000000",
+  "Notes": null,
+  "Created": "2015-01-23T15:47:37+01:00",
+  "Modified": "2015-01-23T15:47:38+01:00",
+  "Expires": null
+}

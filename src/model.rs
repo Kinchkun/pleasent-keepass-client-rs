@@ -5,21 +5,21 @@ use log::*;
 use rusqlite::{params, Connection};
 use serde::Serialize;
 
-pub struct PleasantPasswordModel {
-    connection: Connection,
+pub struct PleasantPasswordModel<'a> {
+    connection: &'a Connection,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq, Default)]
 pub struct Credentials {
-    id: String,
-    folder_name: String,
-    name: String,
-    username: Option<String>,
-    notes: Option<String>,
+    pub id: String,
+    pub folder_name: String,
+    pub name: String,
+    pub username: Option<String>,
+    pub notes: Option<String>,
 }
 
-impl PleasantPasswordModel {
-    pub fn new(connection: Connection) -> Result<Self> {
+impl<'a> PleasantPasswordModel<'a> {
+    pub fn new(connection: &'a Connection) -> Result<Self> {
         let model = PleasantPasswordModel { connection };
         model.init_db()?;
         Ok(model)
@@ -103,7 +103,8 @@ VALUES (?1,?2,?3,?4,?5,?6,?7)
     }
 
     fn add_credentials(&self, credential: CredentialEntry) -> Result<()> {
-        debug!("Add credentials entry {}", &credential.name);
+        use colored::{ColoredString, Colorize};
+        debug!("Add credentials entry ({})", &credential.name.blue());
         let id = &credential.id;
         let name = &credential.name;
         let username = &credential.username;
