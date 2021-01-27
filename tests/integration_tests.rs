@@ -1,13 +1,59 @@
+mod support;
+
 use httpmock::Method::{GET, POST};
 use httpmock::MockServer;
 use pleasent_keepass_client_rs::model::{Credentials, PleasantPasswordModel};
 use pleasent_keepass_client_rs::PleasantPasswordServerClient;
+use pleasent_keepass_client_rs::{Kind, PleasantError};
+use support::setup;
 
 use pretty_assertions::assert_eq;
+use reqwest::Client;
+
+#[tokio::test]
+async fn test_handling_wrong_credentials() {
+    let ctx = setup();
+
+    let server = MockServer::start();
+
+    let token_mock = server.mock(|when, then| {
+        when.method(POST)
+            .path("/OAuth2/token")
+            .body("grant_type=password&username=test_user&password=test_password");
+        then.status(400)
+            .header("Content-Type", "application/json;charset=UTF-8")
+            .body(
+                r#"{
+                "error": "invalid_grant",
+                "error_description": "The username or password is incorrect."
+            }"#,
+            );
+    });
+
+    let client = Client::new();
+    let target = PleasantPasswordServerClient::new(
+        server.base_url().parse().unwrap(),
+        client,
+        "test_user".to_string(),
+        "test_password".to_string(),
+        ":mem:".to_string(),
+    )
+    .expect("error creating client");
+
+    let actual = target.check().await;
+    let expected = Err(PleasantError {
+        kind: Kind::WrongCredentials,
+        message: "Server denied the provided credentials".to_string(),
+        context: "logging in".to_string(),
+        hint: None,
+    });
+    assert_eq!(actual, expected);
+}
 
 #[tokio::test]
 async fn test_sync_and_query() {
-    pretty_env_logger::init_timed();
+    let ctx = setup();
+
     let server = MockServer::start();
     let token_mock = server.mock(|when, then| {
         when.method(POST)
@@ -25,10 +71,7 @@ async fn test_sync_and_query() {
             .body(include_str!("../test_assets/root_folder_response.json"));
     });
 
-    let client = reqwest::Client::builder()
-        .proxy(reqwest::Proxy::http("https://localhost:8080").expect(""))
-        .build()
-        .expect("");
+    let client = Client::new();
 
     let target = PleasantPasswordServerClient::new(
         server.base_url().parse().unwrap(),

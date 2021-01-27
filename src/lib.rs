@@ -1,14 +1,18 @@
 pub mod app;
 mod db;
+mod error;
 mod http_client;
 pub mod model;
 pub mod settings;
 mod timed_cache;
 mod types;
 
+pub use error::{Kind, PleasantError};
+
 use crate::db::db_types::Folder;
 use crate::http_client::HttpClient;
 use crate::model::{Credentials, PleasantPasswordModel};
+use crate::types::PleasantResult;
 use lazy_init::Lazy;
 use log::*;
 use rusqlite::Connection;
@@ -52,6 +56,20 @@ impl PleasantPasswordServerClient {
             //     "cache",
             // )?)?,
         })
+    }
+
+    pub async fn check(&self) -> PleasantResult<()> {
+        info!("Checking configuration");
+        match self.login().await {
+            Ok(token) => Ok(token),
+            Err(error) => Err(PleasantError {
+                kind: Kind::WrongCredentials,
+                message: "Server denied the provided credentials".to_string(),
+                context: "logging in".to_string(),
+                hint: None,
+            }),
+        }?;
+        Ok(())
     }
 
     pub fn query(&self, query: &str) -> Result<Vec<Credentials>> {
