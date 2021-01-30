@@ -1,14 +1,17 @@
 pub mod rest_client;
+mod rest_error;
 
 #[cfg(test)]
 mod tests {
     use httpmock::Method::{GET, POST};
     use httpmock::MockServer;
+    use pretty_assertions::assert_eq;
     use serde_json::{json, Value};
 
-    use super::*;
     use crate::http::rest_client::*;
-    use pretty_assertions::assert_eq;
+    use crate::http::rest_error::OAuthError;
+
+    use super::*;
 
     #[tokio::test]
     async fn login_with_correct_credentials_returns_a_token() {

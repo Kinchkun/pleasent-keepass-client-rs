@@ -1,10 +1,13 @@
-use crate::http::rest_client::OAuthError::NetworkError;
+use std::alloc::dealloc;
+
 use chrono::{DateTime, Utc};
 use log::*;
 use reqwest::{Client, ClientBuilder, Error, IntoUrl, RequestBuilder, Response, StatusCode};
 use serde::Deserialize;
-use std::alloc::dealloc;
 use url::Url;
+
+use crate::http::rest_error::OAuthError;
+use crate::http::rest_error::OAuthError::NetworkError;
 
 pub struct RestClient {
     base_url: Url,
@@ -30,62 +33,6 @@ pub struct AccessToken {
     pub access_token: String,
     pub expires_in: u64,
     pub token_type: String,
-}
-
-#[derive(Debug)]
-pub enum OAuthError {
-    InvalidGrant,
-    UnsupportedGrantType,
-    UnsupportedTokenType {
-        token_type: String,
-    },
-    ProtocolError {
-        message: String,
-    },
-    ServerUnavailable,
-    NetworkError {
-        message: String,
-        cause: std::boxed::Box<dyn std::error::Error>,
-    },
-}
-
-impl PartialEq for OAuthError {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (OAuthError::InvalidGrant, OAuthError::InvalidGrant)
-            | (OAuthError::ServerUnavailable, OAuthError::ServerUnavailable)
-            | (OAuthError::UnsupportedGrantType, OAuthError::UnsupportedGrantType) => true,
-            (
-                OAuthError::UnsupportedTokenType { token_type },
-                OAuthError::UnsupportedTokenType {
-                    token_type: other_token_type,
-                },
-            ) => token_type == other_token_type,
-            (
-                OAuthError::ProtocolError { message },
-                OAuthError::ProtocolError {
-                    message: other_message,
-                },
-            ) => message == other_message,
-            (
-                OAuthError::NetworkError { message, cause },
-                OAuthError::NetworkError {
-                    message: other_message,
-                    cause: other_cause,
-                },
-            ) => message == other_message && cause.to_string() == other_cause.to_string(),
-            _ => false,
-        }
-    }
-}
-
-impl From<reqwest::Error> for OAuthError {
-    fn from(error: reqwest::Error) -> Self {
-        NetworkError {
-            message: "An unhandled network error occurred".to_string(),
-            cause: Box::new((error)),
-        }
-    }
 }
 
 impl RestClientBuilder {
@@ -135,7 +82,7 @@ impl RestClient {
         match response.status() {
             StatusCode::OK => Self::read_token_response(response).await,
             StatusCode::BAD_REQUEST => Self::read_oauth_error(response).await,
-            StatusCode::INTERNAL_SERVER_ERROR => Err(OAuthError::ServerUnavailable),
+            StatusCode::INTERNAL_SERVER_ERROR => Err(OAuthError::InternalServerError),
             _ => Err(OAuthError::ProtocolError {
                 message: format!(
                     "Got invalid status code for token request. Status code {}. Body: \n {}",
