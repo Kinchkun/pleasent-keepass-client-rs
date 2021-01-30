@@ -3,6 +3,7 @@ use serde::export::Formatter;
 #[derive(Debug)]
 pub enum OAuthError {
     InvalidGrant,
+    Unauthorized,
     UnsupportedGrantType,
     UnsupportedTokenType {
         token_type: String,
@@ -22,6 +23,7 @@ impl std::error::Error for OAuthError {}
 impl std::fmt::Display for OAuthError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            OAuthError::Unauthorized => write!(f, "unauthorized"),
             OAuthError::InvalidGrant => write!(f, "The server rejected the provided credentials."),
             OAuthError::UnsupportedGrantType => {
                 write!(f, "The server did not support the provided grant type")
@@ -47,6 +49,7 @@ impl PartialEq for OAuthError {
         match (self, other) {
             (OAuthError::InvalidGrant, OAuthError::InvalidGrant)
             | (OAuthError::InternalServerError, OAuthError::InternalServerError)
+            | (OAuthError::Unauthorized, OAuthError::Unauthorized)
             | (OAuthError::UnsupportedGrantType, OAuthError::UnsupportedGrantType) => true,
             (
                 OAuthError::UnsupportedTokenType { token_type },

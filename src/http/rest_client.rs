@@ -8,6 +8,7 @@ use url::Url;
 
 use crate::http::rest_error::OAuthError;
 use crate::http::rest_error::OAuthError::NetworkError;
+use serde::de::DeserializeOwned;
 
 pub struct RestClient {
     base_url: Url,
@@ -19,8 +20,7 @@ pub struct RestClientBuilder {
     client: ClientBuilder,
 }
 
-pub type RestResult<T, E = RestError> = std::result::Result<T, E>;
-pub struct RestError;
+pub type RestResult<T, E = OAuthError> = std::result::Result<T, E>;
 
 #[derive(Debug, Eq, PartialEq, Deserialize)]
 struct OAuthErrorResponse {
@@ -33,6 +33,12 @@ pub struct AccessToken {
     pub access_token: String,
     pub expires_in: u64,
     pub token_type: String,
+}
+
+impl AsRef<str> for AccessToken {
+    fn as_ref(&self) -> &str {
+        &self.access_token
+    }
 }
 
 impl RestClientBuilder {
@@ -93,12 +99,36 @@ impl RestClient {
         }
     }
 
-    pub async fn get_resource<T>(&self) -> RestResult<T> {
-        todo!()
+    pub async fn get_resource<A: AsRef<str>, P: AsRef<str>, T: DeserializeOwned>(
+        &self,
+        access_token: A,
+        resource_path: P,
+    ) -> RestResult<Option<T>> {
+        let path = resource_path.as_ref();
+        let response = self
+            .get(path)
+            .bearer_auth(access_token.as_ref())
+            .send()
+            .await?;
+
+        let status = response.status();
+        debug!("Got server response: {}", status);
+        match status {
+            StatusCode::OK => Ok(Some(response.json().await?)),
+            StatusCode::NOT_FOUND => Ok(None),
+            StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => Err(OAuthError::Unauthorized),
+            _ => Err(OAuthError::ProtocolError {
+                message: format!(
+                    "While getting {} the server got an unexpected response: {}",
+                    path,
+                    response.text().await?
+                ),
+            }),
+        }
     }
 
     pub async fn put_resource<T>(&self) -> RestResult<T> {
-        todo!()
+        unimplemented!("I didn't need put operations so far. Therefore it is not yet implemented")
     }
 
     async fn read_token_response(response: Response) -> Result<AccessToken, OAuthError> {
@@ -123,6 +153,8 @@ impl RestClient {
             },
         })
     }
+
+    // privates
 
     fn post(&self, path: &str) -> RequestBuilder {
         let target = self.target(path);
