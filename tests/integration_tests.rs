@@ -3,8 +3,8 @@ mod support;
 use httpmock::Method::{GET, POST};
 use httpmock::MockServer;
 use pleasent_keepass_client_rs::model::{Credentials, PleasantPasswordModel};
-use pleasent_keepass_client_rs::PleasantPasswordServerClient;
 use pleasent_keepass_client_rs::{Kind, PleasantError};
+use pleasent_keepass_client_rs::{PleasantPasswordServerClient, RestClientBuilder};
 use support::setup;
 
 use pretty_assertions::assert_eq;
@@ -12,11 +12,10 @@ use reqwest::Client;
 
 #[tokio::test]
 async fn test_handling_wrong_credentials() {
-    let ctx = setup();
-
+    setup();
     let server = MockServer::start();
 
-    let token_mock = server.mock(|when, then| {
+    server.mock(|when, then| {
         when.method(POST)
             .path("/OAuth2/token")
             .body("grant_type=password&username=test_user&password=test_password");
@@ -30,10 +29,8 @@ async fn test_handling_wrong_credentials() {
             );
     });
 
-    let client = Client::new();
     let target = PleasantPasswordServerClient::new(
-        server.base_url().parse().unwrap(),
-        client,
+        RestClientBuilder::new(&server.base_url()).build(),
         "test_user".to_string(),
         "test_password".to_string(),
         ":mem:".to_string(),
@@ -52,10 +49,10 @@ async fn test_handling_wrong_credentials() {
 
 #[tokio::test]
 async fn test_sync_and_query() {
-    let ctx = setup();
+    setup();
 
     let server = MockServer::start();
-    let token_mock = server.mock(|when, then| {
+    server.mock(|when, then| {
         when.method(POST)
             .path("/OAuth2/token")
             .body("grant_type=password&username=test_user&password=test_password");
@@ -64,7 +61,7 @@ async fn test_sync_and_query() {
             .body(include_str!("../test_assets/token_response.json"));
     });
 
-    let root_folder_mock = server.mock(|when, then| {
+    server.mock(|when, then| {
         when.method(GET).path("/api/v5/rest/folders");
         then.status(200)
             .header("Content-Type", "application/json;charset=UTF-8")
@@ -74,8 +71,7 @@ async fn test_sync_and_query() {
     let client = Client::new();
 
     let target = PleasantPasswordServerClient::new(
-        server.base_url().parse().unwrap(),
-        client,
+        RestClientBuilder::new(&server.base_url()).build(),
         "test_user".to_string(),
         "test_password".to_string(),
         ":mem:".to_string(),

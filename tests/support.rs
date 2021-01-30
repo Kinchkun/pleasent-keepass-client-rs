@@ -1,4 +1,9 @@
 pub struct Context;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref ctx: Context = { Context::new() };
+}
 
 impl Context {
     fn new() -> Self {
@@ -7,6 +12,6 @@ impl Context {
     }
 }
 
-pub fn setup() -> Context {
-    Context::new()
+pub fn setup() -> &'static Context {
+    &ctx
 }

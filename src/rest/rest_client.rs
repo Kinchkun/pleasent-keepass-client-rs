@@ -6,8 +6,8 @@ use reqwest::{Client, ClientBuilder, Error, IntoUrl, RequestBuilder, Response, S
 use serde::Deserialize;
 use url::Url;
 
-use crate::http::rest_error::OAuthError;
-use crate::http::rest_error::OAuthError::NetworkError;
+use crate::rest::rest_error::OAuthError;
+use crate::rest::rest_error::OAuthError::NetworkError;
 use serde::de::DeserializeOwned;
 
 pub struct RestClient {
@@ -49,8 +49,12 @@ impl RestClientBuilder {
         }
     }
 
-    pub fn proxy<U: IntoUrl>(&mut self, u: Option<U>) -> &mut Self {
-        todo!()
+    pub fn proxy<U: IntoUrl>(mut self, u: Option<U>) -> Self {
+        if let Some(proxy_scheme) = u {
+            let proxy = reqwest::Proxy::all(proxy_scheme).expect("Invalid proxy scheme");
+            self.client = self.client.proxy(proxy);
+        }
+        self
     }
 
     pub fn build(self) -> RestClient {
@@ -60,12 +64,19 @@ impl RestClientBuilder {
         }
     }
 }
+
 impl RestClient {
-    pub async fn request_access_token(
+    fn new<U: IntoUrl>(u: U) -> Self {
+        RestClientBuilder::new(u).build()
+    }
+
+    pub async fn request_access_token<S: AsRef<str>>(
         &self,
-        login: &str,
-        password: &str,
+        login: S,
+        password: S,
     ) -> Result<AccessToken, OAuthError> {
+        let login = login.as_ref();
+        let password = password.as_ref();
         debug!(
             "Request new access token from {} as {} using password grant",
             &self.base_url, login

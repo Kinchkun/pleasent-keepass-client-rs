@@ -8,8 +8,8 @@ mod tests {
     use pretty_assertions::assert_eq;
     use serde_json::{json, Value};
 
-    use crate::http::rest_client::*;
-    use crate::http::rest_error::OAuthError;
+    use crate::rest::rest_client::*;
+    use crate::rest::rest_error::OAuthError;
 
     use super::*;
 

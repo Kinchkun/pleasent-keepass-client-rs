@@ -1610,6 +1610,7 @@ dependencies = [
  "futures",
  "httpmock",
  "lazy-init",
+ "lazy_static",
  "log",
  "pretty_assertions",
  "pretty_env_logger",
