@@ -1,6 +1,7 @@
 pub mod app;
 mod db;
 mod error;
+mod http;
 mod http_client;
 pub mod model;
 pub mod settings;
