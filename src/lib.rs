@@ -11,6 +11,7 @@ pub use error::{Kind, PleasantError};
 pub use rest::rest_client::RestClientBuilder;
 
 use crate::db::db_types::Folder;
+use crate::error::ResultExt;
 use crate::model::{Credentials, PleasantPasswordModel};
 use crate::rest::rest_client::RestClient;
 use crate::types::PleasantResult;
@@ -21,7 +22,7 @@ use serde::Deserialize;
 use std::error::Error;
 use url::Url;
 
-pub type Result<T> = std::result::Result<T, Box<dyn Error>>;
+pub type Result<T, E = Box<dyn Error>> = std::result::Result<T, E>;
 
 pub struct PleasantPasswordServerClient {
     login: String,
@@ -67,6 +68,7 @@ impl PleasantPasswordServerClient {
                 message: "Server denied the provided credentials".to_string(),
                 context: "logging in".to_string(),
                 hint: None,
+                cause: None,
             }),
         }?;
         Ok(())
@@ -123,7 +125,7 @@ impl PleasantPasswordServerClient {
         Ok(password)
     }
 
-    async fn login(&self) -> Result<String> {
+    async fn login(&self) -> Result<String, PleasantError> {
         info!("Login in");
         // let cached_access_key = self.cache.get("ACCESS_TOKEN")?;
         // if let Some(access_key) = cached_access_key {
@@ -137,7 +139,7 @@ impl PleasantPasswordServerClient {
             .rest_client
             .request_access_token(&self.login, &self.password)
             .await
-            .expect("Got oautherror while logging in");
+            .err_context("".to_string())?;
 
         // self.cache
         //     .put("ACCESS_TOKEN", response.access_token.as_str(), 1036799);

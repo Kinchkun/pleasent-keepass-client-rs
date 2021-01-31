@@ -2,6 +2,7 @@ mod support;
 
 use httpmock::Method::{GET, POST};
 use httpmock::MockServer;
+use log::*;
 use pleasent_keepass_client_rs::model::{Credentials, PleasantPasswordModel};
 use pleasent_keepass_client_rs::{Kind, PleasantError};
 use pleasent_keepass_client_rs::{PleasantPasswordServerClient, RestClientBuilder};
@@ -37,14 +38,17 @@ async fn test_handling_wrong_credentials() {
     )
     .expect("error creating client");
 
-    let actual = target.check().await;
-    let expected = Err(PleasantError {
-        kind: Kind::WrongCredentials,
-        message: "Server denied the provided credentials".to_string(),
-        context: "logging in".to_string(),
-        hint: None,
-    });
-    assert_eq!(actual, expected);
+    let actual = target.check().await.unwrap_err();
+    // let expected = Err(PleasantError {
+    //     kind: Kind::WrongCredentials,
+    //     message: "Server denied the provided credentials".to_string(),
+    //     context: "logging in".to_string(),
+    //     hint: None,
+    //     cause: None,
+    // });
+    //
+    debug!("Got error {}", actual);
+    assert_eq!(actual.kind, Kind::WrongCredentials);
 }
 
 #[tokio::test]

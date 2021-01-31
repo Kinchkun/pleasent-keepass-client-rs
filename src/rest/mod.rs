@@ -1,5 +1,5 @@
 pub mod rest_client;
-mod rest_error;
+pub mod rest_error;
 
 #[cfg(test)]
 mod tests {
