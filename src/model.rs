@@ -19,13 +19,13 @@ pub struct Credentials {
 }
 
 impl<'a> PleasantPasswordModel<'a> {
-    pub fn new(connection: &'a Connection) -> Result<Self> {
+    pub fn new(connection: &'a Connection) -> PleasantResult<Self> {
         let model = PleasantPasswordModel { connection };
         model.init_db()?;
         Ok(model)
     }
 
-    pub fn query_for_credentials(&self, query: &str) -> Result<Vec<Credentials>> {
+    pub fn query_for_credentials(&self, query: &str) -> PleasantResult<Vec<Credentials>> {
         let mut stmt = self.connection.prepare(
             r#"
 SELECT c.id, f.name, c.name, c.username, c.notes FROM credentials c
@@ -59,7 +59,7 @@ OR c.notes like '%' || :query || '%'
         Ok(result)
     }
 
-    pub fn add_root_folder(&self, folder: Folder) -> Result<()> {
+    pub fn add_root_folder(&self, folder: Folder) -> PleasantResult<()> {
         debug!("Add root folder. Truncating tables");
         self.connection.execute_batch(
             r#"
@@ -72,7 +72,7 @@ DELETE FROM attachments;
         self.add_folder(folder)
     }
 
-    fn add_folder(&self, folder: Folder) -> Result<()> {
+    fn add_folder(&self, folder: Folder) -> PleasantResult<()> {
         debug!("Add folder {}", &folder.name);
 
         let statement = r#"
@@ -102,7 +102,7 @@ VALUES (?1,?2,?3,?4,?5,?6,?7)
         Ok(())
     }
 
-    fn add_credentials(&self, credential: CredentialEntry) -> Result<()> {
+    fn add_credentials(&self, credential: CredentialEntry) -> PleasantResult<()> {
         use colored::{ColoredString, Colorize};
         debug!("Add credentials entry ({})", &credential.name.blue());
         let id = &credential.id;
@@ -129,7 +129,7 @@ VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
         Ok(())
     }
 
-    fn add_attachment(&self, attachment: Attachment) -> Result<()> {
+    fn add_attachment(&self, attachment: Attachment) -> PleasantResult<()> {
         debug!("Add attachment into database");
         let statement = r#"
 INSERT INTO attachments (id, credentials_id, file_name, file_size) 
@@ -146,7 +146,7 @@ VALUES (?1,?2,?3,?4)
         Ok(())
     }
 
-    fn init_db(&self) -> Result<()> {
+    fn init_db(&self) -> PleasantResult<()> {
         debug!("Initialize credentials database");
         let sql_statement = include_str!("../assets/sql/init_db.sql");
         self.connection.execute_batch(sql_statement)?;

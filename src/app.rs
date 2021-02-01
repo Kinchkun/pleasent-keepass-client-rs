@@ -1,7 +1,9 @@
-use crate::types::Result;
 use std::path::{Path, PathBuf};
 
-pub fn app_file<S: AsRef<str>, P: AsRef<Path>>(app_name: S, file_name: P) -> Result<PathBuf> {
+pub fn app_file<S: AsRef<str>, P: AsRef<Path>>(
+    app_name: S,
+    file_name: P,
+) -> std::io::Result<PathBuf> {
     let app_dir = directories_next::BaseDirs::new()
         .unwrap()
         .home_dir()

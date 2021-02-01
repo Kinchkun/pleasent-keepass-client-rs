@@ -1,13 +1,15 @@
 use log::info;
-use pleasent_keepass_client_rs::app::app_file;
-use pleasent_keepass_client_rs::settings::{
-    optional_url, require_secure_string, require_string, require_url,
-};
-use pleasent_keepass_client_rs::Result;
-use pleasent_keepass_client_rs::{PleasantPasswordServerClient, RestClientBuilder};
 use reqwest::Proxy;
 use structopt::StructOpt;
 
+use pleasent_keepass_client_rs::app::app_file;
+use pleasent_keepass_client_rs::client::PleasantPasswordServerClient;
+use pleasent_keepass_client_rs::settings::{
+    optional_url, require_secure_string, require_string, require_url,
+};
+use pleasent_keepass_client_rs::{PleasantResult, RestClientBuilder};
+
+type DynError = std::boxed::Box<dyn std::error::Error>;
 #[derive(StructOpt, Debug)]
 #[structopt(about = "pleasant password client")]
 enum Args {
@@ -22,7 +24,7 @@ enum Args {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> PleasantResult<(), DynError> {
     dotenv::dotenv().ok();
     pretty_env_logger::init_timed();
 
@@ -57,7 +59,10 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn print_query(client: PleasantPasswordServerClient, query: String) -> Result<()> {
+fn print_query(
+    client: PleasantPasswordServerClient,
+    query: String,
+) -> PleasantResult<(), DynError> {
     let mut writer = csv::Writer::from_writer(std::io::stdout());
     for cred in client.query(query.as_str())?.into_iter() {
         writer.serialize(cred)?;
@@ -65,7 +70,10 @@ fn print_query(client: PleasantPasswordServerClient, query: String) -> Result<()
     Ok(())
 }
 
-async fn print_password(client: PleasantPasswordServerClient, entry_id: String) -> Result<()> {
+async fn print_password(
+    client: PleasantPasswordServerClient,
+    entry_id: String,
+) -> PleasantResult<()> {
     // 94153de4-1cba-4c13-9c23-41cde415146b
     let password = client.entry_password(entry_id.as_str()).await?.unwrap();
     println!("{}", password);

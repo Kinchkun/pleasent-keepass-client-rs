@@ -20,6 +20,7 @@ pub struct PleasantError {
 pub enum Kind {
     Unhandled,
     WrongCredentials,
+    Database,
 }
 
 #[derive(Debug)]
@@ -29,6 +30,9 @@ pub enum Cause {
     },
     Unknown {
         inner: std::boxed::Box<dyn std::error::Error>,
+    },
+    SqlError {
+        inner: rusqlite::Error,
     },
 }
 
@@ -50,6 +54,12 @@ impl From<OAuthError> for Cause {
     }
 }
 
+impl From<rusqlite::Error> for Cause {
+    fn from(inner: rusqlite::Error) -> Self {
+        Cause::SqlError { inner }
+    }
+}
+
 impl std::error::Error for PleasantError {}
 
 impl std::fmt::Display for PleasantError {
@@ -67,6 +77,18 @@ impl std::fmt::Display for PleasantError {
             writeln!(f, "Hint: {}", hint)?;
         };
         Ok(())
+    }
+}
+
+impl From<rusqlite::Error> for PleasantError {
+    fn from(sql_error: rusqlite::Error) -> Self {
+        PleasantError {
+            kind: Kind::Database,
+            message: "There was an error with the database connection".to_string(),
+            context: "Performing an SQL operation".to_string(),
+            hint: None,
+            cause: Some(Cause::from(sql_error)),
+        }
     }
 }
 

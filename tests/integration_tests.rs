@@ -1,15 +1,16 @@
-mod support;
-
 use httpmock::Method::{GET, POST};
 use httpmock::MockServer;
 use log::*;
-use pleasent_keepass_client_rs::model::{Credentials, PleasantPasswordModel};
-use pleasent_keepass_client_rs::{Kind, PleasantError};
-use pleasent_keepass_client_rs::{PleasantPasswordServerClient, RestClientBuilder};
-use support::setup;
-
 use pretty_assertions::assert_eq;
 use reqwest::Client;
+
+use pleasent_keepass_client_rs::client::PleasantPasswordServerClient;
+use pleasent_keepass_client_rs::model::{Credentials, PleasantPasswordModel};
+use pleasent_keepass_client_rs::RestClientBuilder;
+use pleasent_keepass_client_rs::{Kind, PleasantError};
+use support::setup;
+
+mod support;
 
 #[tokio::test]
 async fn test_handling_wrong_credentials() {
