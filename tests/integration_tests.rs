@@ -38,17 +38,16 @@ async fn test_handling_wrong_credentials() {
     )
     .expect("error creating client");
 
-    let actual = target.check().await.unwrap_err();
-    // let expected = Err(PleasantError {
-    //     kind: Kind::WrongCredentials,
-    //     message: "Server denied the provided credentials".to_string(),
-    //     context: "logging in".to_string(),
-    //     hint: None,
-    //     cause: None,
-    // });
-    //
-    debug!("Got error {}", actual);
-    assert_eq!(actual.kind, Kind::WrongCredentials);
+    let actual = target.check().await;
+    let expected = Err(PleasantError {
+        kind: Kind::WrongCredentials,
+        message: "Server denied the provided credentials".to_string(),
+        context: "logging in".to_string(),
+        hint: None,
+        cause: None,
+    });
+
+    assert_eq!(actual, expected);
 }
 
 #[tokio::test]

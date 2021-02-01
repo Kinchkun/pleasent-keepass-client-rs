@@ -7,19 +7,47 @@ use std::fmt::Result as FmtResult;
 use std::string::ToString;
 use strum_macros::Display as StrumDisplay;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct PleasantError {
     pub kind: Kind,
     pub message: String,
     pub context: String,
     pub hint: Option<String>,
-    pub cause: Option<std::boxed::Box<dyn std::error::Error>>,
+    pub cause: Option<Cause>,
 }
 
 #[derive(Debug, StrumDisplay, PartialEq, Eq)]
 pub enum Kind {
     Unhandled,
     WrongCredentials,
+}
+
+#[derive(Debug)]
+pub enum Cause {
+    OAuthError {
+        inner: OAuthError,
+    },
+    Unknown {
+        inner: std::boxed::Box<dyn std::error::Error>,
+    },
+}
+
+impl PartialEq for Cause {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Cause::OAuthError { inner }, Cause::OAuthError { inner: other }) => inner == other,
+            (Cause::Unknown { inner }, Cause::Unknown { inner: other }) => {
+                inner.to_string() == other.to_string()
+            }
+            _ => false,
+        }
+    }
+}
+
+impl From<OAuthError> for Cause {
+    fn from(inner: OAuthError) -> Self {
+        Cause::OAuthError { inner }
+    }
 }
 
 impl std::error::Error for PleasantError {}
@@ -56,14 +84,14 @@ impl<T> ResultExt<T> for crate::rest::rest_client::RestResult<T, OAuthError> {
                     message: "Your supplied credentials where rejected by the server".to_string(),
                     context,
                     hint: None,
-                    cause: Some(std::boxed::Box::new(oauth_error)),
+                    cause: Some(Cause::from(oauth_error)),
                 }),
                 _ => Err(PleasantError {
                     kind: Kind::Unhandled,
                     message: "An unhandled error occurred".to_string(),
                     context,
                     hint: None,
-                    cause: Some(std::boxed::Box::new(oauth_error)),
+                    cause: Some(Cause::from(oauth_error)),
                 }),
             },
         }
