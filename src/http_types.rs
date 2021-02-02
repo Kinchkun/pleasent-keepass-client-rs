@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 type DateTime = chrono::DateTime<chrono::Utc>;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct CredentialEntry {
     pub id: String,
@@ -17,7 +17,7 @@ pub struct CredentialEntry {
     pub synced: Option<DateTime>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Folder {
     pub credentials: Vec<CredentialEntry>,
@@ -31,7 +31,7 @@ pub struct Folder {
     pub synced: Option<DateTime>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Attachment {
     pub credential_object_id: String,

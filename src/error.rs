@@ -21,6 +21,7 @@ pub enum Kind {
     Unhandled,
     WrongCredentials,
     Database,
+    MissingItem,
 }
 
 #[derive(Debug)]

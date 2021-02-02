@@ -1,4 +1,4 @@
-use crate::db::db_types::{Attachment, CredentialEntry, Folder};
+use crate::http_types::{Attachment, CredentialEntry, Folder};
 use crate::types::*;
 use chrono::Utc;
 use log::*;

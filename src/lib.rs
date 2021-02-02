@@ -9,16 +9,17 @@ use url::Url;
 pub use error::{Kind, PleasantError};
 pub use rest::rest_client::RestClientBuilder;
 
-use crate::db::db_types::Folder;
 use crate::error::ResultExt;
+use crate::http_types::Folder;
 use crate::model::{Credentials, PleasantPasswordModel};
 use crate::rest::rest_client::RestClient;
 pub use crate::types::PleasantResult;
 
 pub mod app;
 pub mod client;
-mod db;
+pub mod db;
 mod error;
+mod http_types;
 pub mod model;
 mod rest;
 pub mod settings;

@@ -2,8 +2,8 @@ use lazy_init::Lazy;
 use log::*;
 use rusqlite::Connection;
 
-use crate::db::db_types::Folder;
 use crate::error::ResultExt;
+use crate::http_types::Folder;
 use crate::model::{Credentials, PleasantPasswordModel};
 use crate::rest::rest_client::RestClient;
 use crate::types::PleasantResult;
@@ -78,8 +78,15 @@ impl PleasantPasswordServerClient {
             .rest_client
             .get_resource(access_token, "/api/v5/rest/folders")
             .await
-            .expect("Error while getting root folder")
-            .expect("Error while reading root folder");
+            .err_context("Downloading the root folder".to_string())?
+            .ok_or_else(|| PleasantError {
+                kind: Kind::Unhandled,
+                message: "Could not download root folder because it was not found on the server"
+                    .to_string(),
+                context: "Path: /api/v4/rest/folders".to_string(),
+                hint: None,
+                cause: None,
+            })?;
         debug!("Successfully got root folder");
         Ok(root_folder)
     }
