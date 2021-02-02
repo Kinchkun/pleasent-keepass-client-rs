@@ -17,7 +17,7 @@ pub use crate::types::PleasantResult;
 
 pub mod app;
 pub mod client;
-pub mod db;
+mod credentials_database;
 mod error;
 mod http_types;
 pub mod model;
