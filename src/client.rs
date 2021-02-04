@@ -3,8 +3,7 @@ use log::*;
 use rusqlite::Connection;
 
 use crate::error::ResultExt;
-use crate::http_types::Folder;
-use crate::model::{Credentials, PleasantPasswordModel};
+use crate::model::http_types::Folder;
 use crate::rest::rest_client::RestClient;
 use crate::types::PleasantResult;
 use crate::{Kind, PleasantError};
@@ -53,23 +52,23 @@ impl PleasantPasswordServerClient {
         Ok(())
     }
 
-    pub fn query(&self, query: &str) -> PleasantResult<Vec<Credentials>> {
-        let connection = self
-            .open_database_connection()
-            .expect("could not open database");
-        let model = PleasantPasswordModel::new(connection)?;
-        model.query_for_credentials(query)
-    }
-
-    pub async fn sync(&self) -> PleasantResult<()> {
-        info!("Syncing local with remote database");
-        let connection = self
-            .open_database_connection()
-            .expect("Could not open database");
-        let model = PleasantPasswordModel::new(connection)?;
-        let root_folder = self.list_entries().await?;
-        model.add_root_folder(root_folder)
-    }
+    // pub fn query(&self, query: &str) -> PleasantResult<Vec<Credentials>> {
+    //     let connection = self
+    //         .open_database_connection()
+    //         .expect("could not open database");
+    //     let model = PleasantPasswordModel::new(connection)?;
+    //     model.query_for_credentials(query)
+    // }
+    //
+    // pub async fn sync(&self) -> PleasantResult<()> {
+    //     info!("Syncing local with remote database");
+    //     let connection = self
+    //         .open_database_connection()
+    //         .expect("Could not open database");
+    //     let model = PleasantPasswordModel::new(connection)?;
+    //     let root_folder = self.list_entries().await?;
+    //     model.add_root_folder(root_folder)
+    // }
 
     pub async fn list_entries(&self) -> PleasantResult<Folder> {
         info!("Fetching all credentials entries");
@@ -83,7 +82,7 @@ impl PleasantPasswordServerClient {
                 kind: Kind::Unhandled,
                 message: "Could not download root folder because it was not found on the server"
                     .to_string(),
-                context: "Path: /api/v4/rest/folders".to_string(),
+                context: "Path: /api/v5/rest/folders".to_string(),
                 hint: None,
                 cause: None,
             })?;

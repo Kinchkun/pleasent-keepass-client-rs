@@ -49,13 +49,13 @@ async fn main() -> PleasantResult<(), DynError> {
 
     let args: Args = Args::from_args();
 
-    match args {
-        Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
-        Args::Tree {} => println!("{:#?}", client.list_entries().await?),
-        Args::Sync {} => client.sync().await?,
-        Args::Query { query } => print_query(client, query)?,
-    };
-
+    // match args {
+    //     Args::GetPassword { entry_id } => print_password(client, entry_id).await?,
+    //     Args::Tree {} => println!("{:#?}", client.list_entries().await?),
+    //     // Args::Sync {} => client.sync().await?,
+    //     Args::Query { query } => print_query(client, query)?,
+    // };
+    //
     Ok(())
 }
 
@@ -63,10 +63,10 @@ fn print_query(
     client: PleasantPasswordServerClient,
     query: String,
 ) -> PleasantResult<(), DynError> {
-    let mut writer = csv::Writer::from_writer(std::io::stdout());
-    for cred in client.query(query.as_str())?.into_iter() {
-        writer.serialize(cred)?;
-    }
+    // let mut writer = csv::Writer::from_writer(std::io::stdout());
+    // for cred in client.query(query.as_str())?.into_iter() {
+    //     writer.serialize(cred)?;
+    // }
     Ok(())
 }
 
